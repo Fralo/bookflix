@@ -3,6 +3,7 @@ WORKDIR /app
 
 COPY . /app/
 
+RUN mvn clean
 RUN mvn package
 
-ENTRYPOINT ["java", "-cp", "target/bookflix-1.0-SNAPSHOT.jar", "dev.fralo.bookflix.App"]
+ENTRYPOINT ["java", "-jar", "target/bookflix-1.0-SNAPSHOT-jar-with-dependencies.jar"]

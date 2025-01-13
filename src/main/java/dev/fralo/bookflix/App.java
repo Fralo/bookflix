@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -32,6 +33,10 @@ public class App {
         System.out.println("Server is running on port 8000");
     }
 
+    static class Request {
+        int id = 10;
+    }
+
     // define a custom HttpHandler
     static class MyHandler implements HttpHandler {
 
@@ -45,7 +50,14 @@ public class App {
             System.out.println("URI:");
             System.out.println(exchange.getRequestURI());
             System.out.println("BODY:");
-            System.out.println(this.readStream(exchange.getRequestBody()));
+            String rawBody = this.readStream(exchange.getRequestBody());
+
+            Gson gson = new Gson();
+            Request a = gson.fromJson(rawBody, Request.class);
+
+            System.out.println("Dal body:");
+            System.out.println(a.id);
+
             System.out.println("HEADERS:");
             Headers headers = exchange.getRequestHeaders();
 
