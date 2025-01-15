@@ -2,18 +2,14 @@ package dev.fralo.bookflix;
 
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 
-import com.google.gson.Gson;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+
+import dev.fralo.bookflix.core.Request;
+import dev.fralo.bookflix.core.Response;
 
 /**
  * Hello world!
@@ -33,54 +29,28 @@ public class App {
         System.out.println("Server is running on port 8000");
     }
 
-    static class Request {
-        int id = 10;
-    }
-
     // define a custom HttpHandler
     static class MyHandler implements HttpHandler {
 
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            // handle the request
-            String response = "Hello, this is a simple HTTP server response!";
+            try {
+                // handle the request
+                Request request = new Request(exchange);
 
-            System.out.println("Metodo:");
-            System.out.println(exchange.getRequestMethod());
-            System.out.println("URI:");
-            System.out.println(exchange.getRequestURI());
-            System.out.println("BODY:");
-            String rawBody = this.readStream(exchange.getRequestBody());
+                String result = "Hai inviato una " + request.getMethod() + " a " + request.getUri();
 
-            Gson gson = new Gson();
-            Request a = gson.fromJson(rawBody, Request.class);
+                Response response = new Response(exchange);
+                response.send(200, result);
+                
+            }catch(Exception e) {
+                System.out.println(e.getClass());
+                String errorMessage = e.getMessage();
+                System.err.println(errorMessage);
 
-            System.out.println("Dal body:");
-            System.out.println(a.id);
-
-            System.out.println("HEADERS:");
-            Headers headers = exchange.getRequestHeaders();
-
-            System.out.print("Authorization: `");
-            System.out.print(headers.get("Authorization"));
-            System.out.println("`");
-
-            exchange.sendResponseHeaders(200, response.length());
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        }
-
-        private String readStream(InputStream stream) throws IOException {
-            int bufferSize = 1024;
-            char[] buffer = new char[bufferSize];
-            StringBuilder out = new StringBuilder();
-            Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
-
-            for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0;) {
-                out.append(buffer, 0, numRead);
+                Response errorResponse = new Response(exchange);
+                errorResponse.send(400, errorMessage);
             }
-            return out.toString();
         }
     }
 }
