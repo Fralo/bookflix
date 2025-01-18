@@ -21,4 +21,5 @@ buildNumber.properties
 .classpath
 .vscode
 
-# End of https://www.toptal.com/developers/gitignore/api/maven
+### Database
+db-data
