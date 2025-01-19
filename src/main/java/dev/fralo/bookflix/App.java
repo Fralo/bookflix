@@ -15,11 +15,18 @@ import com.sun.net.httpserver.HttpServer;
 
 import dev.fralo.bookflix.core.Request;
 import dev.fralo.bookflix.core.Response;
+import dev.fralo.bookflix.db.MigrationManager;
 
 public class App {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException, Exception {
 
-        connect();
+        
+        startDb();
+
+
+
+
+        
         // Create an HttpServer instance
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
 
@@ -31,6 +38,11 @@ public class App {
         server.start();
 
         System.out.println("Server is running on port 8000");
+    }
+
+    static void startDb() throws SQLException, Exception{
+        MigrationManager mm = new MigrationManager();
+        mm.runMigrations();
     }
 
     static Connection connect() {

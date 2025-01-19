@@ -1,0 +1,1 @@
+CREATE TABLE books (id bigserial primary key, title text NOT NULL);
