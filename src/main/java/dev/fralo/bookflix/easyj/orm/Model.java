@@ -141,4 +141,24 @@ public abstract class Model {
             throw new SQLException("Error creating model instance", e);
         }
     }
+
+    @Override
+    public String toString() {
+        String fieldList = "";
+
+        for(Field field : this.getClass().getDeclaredFields()) {
+            try {
+                field.setAccessible(true);
+                fieldList += field.getName() + "=" + field.get(this) + ",";
+            } catch (IllegalAccessException e) {
+                System.err.println("Cannot access field " + field.getName());
+            }
+        }
+
+        return String.format(
+            "%s(%s)",
+            this.getClass().getName(),
+            fieldList
+        );
+    }
 }

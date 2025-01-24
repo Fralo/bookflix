@@ -27,10 +27,12 @@ public class App {
         
 
 
-        User u = new User("cannavacciuolo", "gugugaga");
-        u.save();
+        // User u = new User("cannavacciuolo", "gugugaga");
+        // u.save();
 
-        System.out.println("Salvato correttamente");
+        User canna = Model.get(User.class, 1);
+
+        System.out.println(canna);
 
         
         // Create an HttpServer instance
