@@ -31,8 +31,10 @@ public class App {
         // u.save();
 
         User canna = Model.get(User.class, 1);
-
         System.out.println(canna);
+        System.out.println(canna.getId());
+
+        canna.delete();
 
         
         // Create an HttpServer instance

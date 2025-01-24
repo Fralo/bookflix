@@ -6,7 +6,6 @@ import dev.fralo.bookflix.easyj.orm.Model;
 
 @Table(name = "users")
 public class User extends Model {
-    
 
     @Column(name = "email")
     private String email;
@@ -23,8 +22,8 @@ public class User extends Model {
     }
 
     // Getters/Setters
-    
-    
+    public Integer getId() { return id; }
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
