@@ -1,4 +1,4 @@
-package dev.fralo.bookflix.db;
+package dev.fralo.bookflix.easyj.db;
 
 import java.io.File;
 import java.sql.Connection;

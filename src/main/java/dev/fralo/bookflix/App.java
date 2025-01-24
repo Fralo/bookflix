@@ -15,16 +15,22 @@ import com.sun.net.httpserver.HttpServer;
 
 import dev.fralo.bookflix.core.Request;
 import dev.fralo.bookflix.core.Response;
-import dev.fralo.bookflix.db.MigrationManager;
+import dev.fralo.bookflix.easyj.db.Database;
+import dev.fralo.bookflix.easyj.db.MigrationManager;
+import dev.fralo.bookflix.easyj.orm.Model;
+import dev.fralo.bookflix.models.User;
 
 public class App {
     public static void main(String[] args) throws IOException, SQLException, Exception {
 
+        startup();
         
-        startDb();
 
 
+        User u = new User("cannavacciuolo", "gugugaga");
+        u.save();
 
+        System.out.println("Salvato correttamente");
 
         
         // Create an HttpServer instance
@@ -38,6 +44,11 @@ public class App {
         server.start();
 
         System.out.println("Server is running on port 8000");
+    }
+
+    static void startup() throws IOException, SQLException, Exception {
+        startDb();
+        Model.setDatabase(Database.getConnection());
     }
 
     static void startDb() throws SQLException, Exception{
