@@ -9,15 +9,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import dev.fralo.bookflix.core.Request;
-import dev.fralo.bookflix.core.Response;
+import dev.fralo.bookflix.controllers.UserController;
 import dev.fralo.bookflix.easyj.db.Database;
 import dev.fralo.bookflix.easyj.db.MigrationManager;
 import dev.fralo.bookflix.easyj.orm.Model;
+import dev.fralo.bookflix.easyj.routing.Router;
 
 public class App {
     public static void main(String[] args) throws IOException, SQLException, Exception {
@@ -25,12 +23,10 @@ public class App {
 
         // Create an HttpServer instance
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+        Router router = Router.getInstance();
+        
 
-        // Create a context for a specific path and set the handler
-        server.createContext("/", new MyHandler());
-
-        // Start the server
-        server.setExecutor(null); // Use the default executor
+        server.createContext("/", router.createHandler());
         server.start();
 
         System.out.println("Server is running on port 8000");
@@ -39,6 +35,12 @@ public class App {
     static void startup() throws IOException, SQLException, Exception {
         startDb();
         Model.setDatabase(Database.getConnection());
+        startRouter();
+    }
+
+    static void startRouter() {
+        Router router = Router.getInstance();
+        router.registerController(UserController.class);
     }
 
     static void startDb() throws SQLException, Exception{
@@ -71,30 +73,5 @@ public class App {
         }
 
         return c;
-    }
-
-    // define a custom HttpHandler
-    static class MyHandler implements HttpHandler {
-
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            try {
-                // handle the request
-                Request request = new Request(exchange);
-
-                String result = "Hai inviato una " + request.getMethod() + " a " + request.getUri();
-
-                Response response = new Response(exchange);
-                response.send(200, result);
-                
-            }catch(Exception e) {
-                System.out.println(e.getClass());
-                String errorMessage = e.getMessage();
-                System.err.println(errorMessage);
-
-                Response errorResponse = new Response(exchange);
-                errorResponse.send(400, errorMessage);
-            }
-        }
     }
 }

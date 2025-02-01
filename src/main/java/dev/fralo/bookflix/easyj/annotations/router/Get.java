@@ -1,15 +1,13 @@
-package dev.fralo.bookflix.easyj.annotations;
+package dev.fralo.bookflix.easyj.annotations.router;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
-
-// Annotation to mark database tables
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Table {
-    String name();
+public @interface Get {
+    String value();
 }
+

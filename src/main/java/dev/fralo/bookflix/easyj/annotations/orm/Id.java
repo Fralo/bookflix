@@ -1,4 +1,4 @@
-package dev.fralo.bookflix.easyj.annotations;
+package dev.fralo.bookflix.easyj.annotations.orm;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

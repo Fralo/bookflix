@@ -1,4 +1,4 @@
-package dev.fralo.bookflix.core;
+package dev.fralo.bookflix.easyj.routing;
 
 import java.io.IOException;
 import java.io.OutputStream;

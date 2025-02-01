@@ -1,7 +1,7 @@
 package dev.fralo.bookflix.models;
 
-import dev.fralo.bookflix.easyj.annotations.Column;
-import dev.fralo.bookflix.easyj.annotations.Table;
+import dev.fralo.bookflix.easyj.annotations.orm.Column;
+import dev.fralo.bookflix.easyj.annotations.orm.Table;
 import dev.fralo.bookflix.easyj.orm.Model;
 
 @Table(name = "users")

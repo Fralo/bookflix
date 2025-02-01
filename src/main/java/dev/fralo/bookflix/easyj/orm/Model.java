@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import dev.fralo.bookflix.easyj.annotations.Column;
-import dev.fralo.bookflix.easyj.annotations.Id;
-import dev.fralo.bookflix.easyj.annotations.Table;
+import dev.fralo.bookflix.easyj.annotations.orm.Column;
+import dev.fralo.bookflix.easyj.annotations.orm.Id;
+import dev.fralo.bookflix.easyj.annotations.orm.Table;
 
 public abstract class Model {
     private static Connection databaseConnection;
