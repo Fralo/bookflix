@@ -18,25 +18,11 @@ import dev.fralo.bookflix.core.Response;
 import dev.fralo.bookflix.easyj.db.Database;
 import dev.fralo.bookflix.easyj.db.MigrationManager;
 import dev.fralo.bookflix.easyj.orm.Model;
-import dev.fralo.bookflix.models.User;
 
 public class App {
     public static void main(String[] args) throws IOException, SQLException, Exception {
-
         startup();
-        
 
-
-        // User u = new User("cannavacciuolo", "gugugaga");
-        // u.save();
-
-        User canna = Model.get(User.class, 1);
-        System.out.println(canna);
-        System.out.println(canna.getId());
-
-        canna.delete();
-
-        
         // Create an HttpServer instance
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
 
