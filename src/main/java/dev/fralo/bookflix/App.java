@@ -3,11 +3,7 @@ package dev.fralo.bookflix;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -18,25 +14,13 @@ import dev.fralo.bookflix.core.Response;
 import dev.fralo.bookflix.easyj.db.Database;
 import dev.fralo.bookflix.easyj.db.MigrationManager;
 import dev.fralo.bookflix.easyj.orm.Model;
-import dev.fralo.bookflix.models.User;
+import dev.fralo.bookflix.easyj.routing.Router;
 
 public class App {
     public static void main(String[] args) throws IOException, SQLException, Exception {
 
         startup();
-        
-
-
-        // User u = new User("cannavacciuolo", "gugugaga");
-        // u.save();
-
-        User canna = Model.get(User.class, 1);
-        System.out.println(canna);
-        System.out.println(canna.getId());
-
-        canna.delete();
-
-        
+                
         // Create an HttpServer instance
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
 
@@ -60,33 +44,6 @@ public class App {
         mm.runMigrations();
     }
 
-    static Connection connect() {
-        String url = "jdbc:postgresql://host.docker.internal:15432/";
-        String username = "postgres";
-        String password = "password";
-
-        Connection c = null;
-        try {
-            c= DriverManager.getConnection(url, username, password);
-
-            Statement st = c.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM users");
-            while (rs.next()) {
-                System.out.print("Column 1 returned ");
-                System.out.println(rs.getString(1));
-                System.out.print("Column 2 returned ");
-                System.out.println(rs.getString(2));
-            }
-            rs.close();
-            st.close();
-        } catch (SQLException e) {
-            System.out.println("Impossibile connettersi al database");
-            System.err.println(e.getMessage());
-        }
-
-        return c;
-    }
-
     // define a custom HttpHandler
     static class MyHandler implements HttpHandler {
 
@@ -95,11 +52,18 @@ public class App {
             try {
                 // handle the request
                 Request request = new Request(exchange);
-
-                String result = "Hai inviato una " + request.getMethod() + " a " + request.getUri();
-
                 Response response = new Response(exchange);
-                response.send(200, result);
+                Router router = Router.getInstance();
+
+                router.register("GET", "/users", (Request req,Response res) -> {
+                    String result = "Hai inviato una mannaggia a te " + req.getMethod() + " a " + req.getUri();
+
+                    response.send(200, result);
+                });
+
+                router.handle(request, response);
+
+                
                 
             }catch(Exception e) {
                 System.out.println(e.getClass());

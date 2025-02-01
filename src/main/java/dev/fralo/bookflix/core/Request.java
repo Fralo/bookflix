@@ -52,11 +52,6 @@ public class Request {
         }
     }
 
-
-
-
-
-
     private String readStream(InputStream stream) throws IOException {
         int bufferSize = 1024;
         char[] buffer = new char[bufferSize];
