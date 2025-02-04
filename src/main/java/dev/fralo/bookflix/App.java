@@ -19,13 +19,13 @@ import dev.fralo.bookflix.easyj.routing.Router;
 public class App {
     public static void main(String[] args) throws IOException, SQLException, Exception {
         int port = 8000;
-        startup();
+        bootstrap();
                 
         // Create an HttpServer instance
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
         // Create a context for a specific path and set the handler
-        server.createContext("/", new MyHandler());
+        server.createContext("/", new RequestHandler());
 
         // Start the server
         server.setExecutor(null); // Use the default executor
@@ -34,18 +34,18 @@ public class App {
         System.out.println("Server is running on port " + String.valueOf(port) );
     }
 
-    static void startup() throws IOException, SQLException, Exception {
-        startDb();
+    static void bootstrap() throws IOException, SQLException, Exception {
+        bootstrapDatabase();
         Model.setDatabase(Database.getConnection());
     }
 
-    static void startDb() throws SQLException, Exception{
+    static void bootstrapDatabase() throws SQLException, Exception{
         MigrationManager mm = new MigrationManager();
         mm.runMigrations();
     }
 
     // define a custom HttpHandler
-    static class MyHandler implements HttpHandler {
+    static class RequestHandler implements HttpHandler {
 
         @Override
         public void handle(HttpExchange exchange) throws IOException {
