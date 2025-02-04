@@ -2,8 +2,8 @@ package dev.fralo.bookflix.easyj.routing;
 
 import java.util.HashMap;
 
-import dev.fralo.bookflix.core.Request;
-import dev.fralo.bookflix.core.Response;
+import dev.fralo.bookflix.easyj.core.Request;
+import dev.fralo.bookflix.easyj.core.Response;
 
 public class Router {
     private static Router router;
