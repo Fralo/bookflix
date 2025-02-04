@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Database {
-    private static final String URL = "jdbc:postgresql://host.docker.internal:15432/";
+    private static final String URL = "jdbc:postgresql://0.0.0.0:15432/";
     private static final String USERNAME = "postgres";
     private static final String PASSWORD = "password";
 
