@@ -18,11 +18,11 @@ import dev.fralo.bookflix.easyj.routing.Router;
 
 public class App {
     public static void main(String[] args) throws IOException, SQLException, Exception {
-
+        int port = 8000;
         startup();
                 
         // Create an HttpServer instance
-        HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
         // Create a context for a specific path and set the handler
         server.createContext("/", new MyHandler());
@@ -31,7 +31,7 @@ public class App {
         server.setExecutor(null); // Use the default executor
         server.start();
 
-        System.out.println("Server is running on port 8000");
+        System.out.println("Server is running on port " + String.valueOf(port) );
     }
 
     static void startup() throws IOException, SQLException, Exception {
@@ -55,7 +55,7 @@ public class App {
                 Response response = new Response(exchange);
                 Router router = Router.getInstance();
 
-                router.register("GET", "/users", (Request req,Response res) -> {
+                router.register("GET", "/users", (Request req, Response res) -> {
                     String result = "Hai inviato una mannaggia a te " + req.getMethod() + " a " + req.getUri();
 
                     response.send(200, result);
