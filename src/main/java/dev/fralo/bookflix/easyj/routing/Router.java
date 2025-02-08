@@ -1,10 +1,52 @@
 package dev.fralo.bookflix.easyj.routing;
 
 import java.util.HashMap;
-import java.util.Set;
 
 import dev.fralo.bookflix.easyj.core.Request;
 import dev.fralo.bookflix.easyj.core.Response;
+
+class PathMatcher {
+    public static boolean matches(String routePath, String requestPath) {
+        String[] routeParts = routePath.split("/");
+        String[] requestParts = requestPath.split("/");
+
+        if(routeParts.length != requestParts.length) {
+            return false;
+        }
+
+        for (int i = 0; (i < routeParts.length); i++) {
+            if (isParameter(routeParts[i])) {
+                continue;
+            }
+
+            if (!routeParts[i].equals(requestParts[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static HashMap<String, String> extractParameters(String routePath, String requestPath) {
+        HashMap<String, String> params = new HashMap<>();
+        String[] routeParts = routePath.split("/");
+        String[] requestParts = requestPath.split("/");
+
+        for (int i = 0; i < routeParts.length; i++) {
+            if (isParameter(routeParts[i])) {
+                String paramName = routeParts[i].substring(1, routeParts[i].length() - 1);
+                params.put(paramName, requestParts[i]);
+            }
+        }
+
+        return params;
+    }
+
+    private static boolean isParameter(String value) {
+        return value.startsWith("{") && value.endsWith("}");
+    }
+}
+
 
 public class Router {
     private static Router router;
@@ -42,58 +84,24 @@ public class Router {
 
         String methodPathKey = this.buildKey(method, uri);
 
-        // doesn't have directly the route
-        if (!routes.containsKey(methodPathKey)) {
-            methodPathKey = this.getMatchingPath(request, method, uri);
-
-            if (methodPathKey == null) {
-                return null;
-            }
+        // does have directly the route
+        if (routes.containsKey(methodPathKey)) {
+            return this.routes.get(methodPathKey);
         }
-        return this.routes.get(methodPathKey);
-    }
 
-    private String getMatchingPath(Request request, String method, String uri) {
-        Set<String> keys = routes.keySet();
-
-        for (String key : keys) {
-            String subKey = key.replace(method.concat("-"), "");
-
-            String[] pathParts = subKey.split("/");
-            String[] uriParts = uri.split("/");
-
-            // not the same length
-            if (pathParts.length != uriParts.length) {
-                continue;
-            }
-            Boolean notMatching = false;
-            HashMap<String, String> collecterdParameters = new HashMap<>();
-            for (int i = 0; (i < pathParts.length); i++) {
-                if (pathParts[i].equals(uriParts[i]) && !pathParts[i].startsWith("{")) {
-                    continue;
-                }
-
-                if (!pathParts[i].startsWith("{")) {
-                    notMatching = true;
-                    break;
-                }
-
-                collecterdParameters.put(
-                        pathParts[i].substring(1, pathParts[i].length() - 1),
-                        uriParts[i]);
-            }
-
-            if (notMatching) {
+        //we try to match with parameters
+        for (String routeKey : routes.keySet()) {
+            if(!routeKey.startsWith(method.concat("-"))) {
                 continue;
             }
 
-            // otherwise everything has matched! set the parameters on the request and
-            // return the path
-            request.setRouteParams(collecterdParameters);
-            return key;
+            String routePath = routeKey.substring(method.length()+1); //removes method and separator (ex. GET-)
+            if(PathMatcher.matches(routePath, uri)) {
+                request.setRouteParams(PathMatcher.extractParameters(routePath, uri));
+                return this.routes.get(routeKey);
+            }
         }
-
-        // nothing matched
+        
         return null;
     }
 
