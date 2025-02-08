@@ -91,23 +91,6 @@ public abstract class Model {
         }
     }
 
-    // Get a record by ID
-    public static <T extends Model> T get(Class<T> modelClass, int id) throws SQLException {
-        String tableName = modelClass.getAnnotation(Table.class).name();
-        String sql = "SELECT * FROM " + tableName + " WHERE id = ?";
-        
-        try (PreparedStatement stmt = databaseConnection.prepareStatement(sql)) {
-            
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapResultSetToModel(rs, modelClass);
-                }
-            }
-        }
-        return null;
-    }
-
     // Helper methods
     private List<Field> getPersistableFields() {
         return Arrays.stream(this.getClass().getDeclaredFields())
@@ -137,7 +120,11 @@ public abstract class Model {
         return this.getClass().getAnnotation(Table.class).name();
     }
 
-    private static <T extends Model> T mapResultSetToModel(ResultSet rs, Class<T> modelClass) throws SQLException {
+    public static <T extends Model> QueryBuilder<T> queryBuilder(Class<T> modelClass) {
+        return new QueryBuilder<>(modelClass, databaseConnection);
+    }
+
+    protected static <T extends Model> T mapResultSetToModel(ResultSet rs, Class<T> modelClass) throws SQLException {
         try {
             T instance = modelClass.getDeclaredConstructor().newInstance();
             

@@ -15,7 +15,10 @@ public class UserController extends Controller {
     @Override
     public void register() {
         this.get("/{id}", (Request req, Response res) -> {
-            User u = User.get(User.class, req.getRouteParamInt("id"));
+            User u = User.get(
+                User.class,
+                req.getRouteParamInt("id")
+            );
             res.json(u);
         });
 
