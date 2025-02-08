@@ -1,16 +1,17 @@
 package dev.fralo.bookflix.easyj.bootstrappers;
 
-import dev.fralo.bookflix.easyj.core.Request;
-import dev.fralo.bookflix.easyj.core.Response;
-import dev.fralo.bookflix.easyj.routing.Router;
+import java.util.ArrayList;
+import java.util.List;
+
+import dev.fralo.bookflix.controllers.UserController;
+import dev.fralo.bookflix.easyj.routing.Controller;
 
 public class RouterBootstrapper extends Bootstrapper {
-
-    private final Router router;
-
-    public RouterBootstrapper() {
-        this.router = Router.getInstance();
-    }
+    public static List<Controller> controllers = new ArrayList<Controller>() {
+        {
+            add(new UserController());
+        };
+    };
 
     @Override
     public void bootstrap() throws Exception {
@@ -18,10 +19,8 @@ public class RouterBootstrapper extends Bootstrapper {
     }
 
     private void registerRoutes() {
-        router.register("GET", "/users", (Request req, Response res) -> {
-            String result = "Hai inviato una " + req.getMethod() + " a " + req.getUri();
-
-            res.send(200, result);
-        });
+        for (Controller controller : controllers) {
+            controller.register();
+        }
     }
 }

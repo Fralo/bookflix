@@ -8,7 +8,7 @@ import dev.fralo.bookflix.easyj.core.RequestHandler;
 
 public class HttpServerBootstrapper extends Bootstrapper {
 
-    final int PORT = 8000;
+    private final int PORT = 8000;
 
     @Override
     public void bootstrap() throws Exception {

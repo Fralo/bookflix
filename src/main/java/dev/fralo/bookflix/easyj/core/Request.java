@@ -45,7 +45,7 @@ public class Request {
 
     public Object getBody() {
         try {
-            return "NOT IMPLEMENTED";
+            return this.rawBody;
         } catch (Exception e) {
             System.err.println(e.getMessage());
             return null;

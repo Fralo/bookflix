@@ -1,14 +1,25 @@
 package dev.fralo.bookflix.easyj.routing;
 
-import dev.fralo.bookflix.easyj.core.Request;
-import dev.fralo.bookflix.easyj.core.Response;
-
 public abstract class Controller {
-    protected final Response response;
-    protected final Request request;
+    protected final Router router;
+    protected String basePath = "";
 
-    public Controller(Request request, Response response) {
-        this.request = request;
-        this.response = response;
+    public Controller() {
+        this.router = Router.getInstance();
     }
+
+    public void get(String path, RouteHandler handler) {
+        this.router.register("GET", basePath.concat(path), handler);
+    }
+    public void post(String path, RouteHandler handler) {
+        this.router.register("POST", basePath.concat(path), handler);
+    }
+    public void patch(String path, RouteHandler handler) {
+        this.router.register("PATCH", basePath.concat(path), handler);
+    }
+    public void delete(String path, RouteHandler handler) {
+        this.router.register("DELETE", basePath.concat(path), handler);
+    }
+
+    public abstract void register();
 }
