@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Optional;
 
 import com.google.gson.Gson;
@@ -21,6 +22,7 @@ public class Request {
     private String rawBody;
     private Gson gson;
     private JsonObject jsonBody;
+    private HashMap<String, String> routeParams;
 
     public Request(HttpExchange exchange) throws IOException {
         this.gson = new Gson();
@@ -28,6 +30,7 @@ public class Request {
         this.method = exchange.getRequestMethod();
         this.headers = exchange.getRequestHeaders();
         this.rawBody = this.readStream(exchange.getRequestBody());
+        this.routeParams = new HashMap<>();
         
         // if request is content type json, we parse the body
         String contentType = this.getHeader("Content-Type");
@@ -39,6 +42,14 @@ public class Request {
             }
         }
     }
+
+    public void setRouteParams(HashMap<String, String> params) {
+        this.routeParams = params;
+    }
+
+    public void setRouteParam(String name, String value) {
+        this.routeParams.put(name, value);
+    } 
 
     public String getMethod() {
         return this.method;
@@ -53,6 +64,10 @@ public class Request {
 
     public String getUri() {
         return this.exchange.getRequestURI().toString();
+    }
+
+    public String getRouteParam(String name) {
+        return this.routeParams.get(name);
     }
 
     public String getRawBody() {
