@@ -44,8 +44,10 @@ public abstract class Model {
     private int insert() throws SQLException, IllegalAccessException {
         List<Field> columns = getPersistableFields();
 
-        return queryBuilder(this.getClass())
+        this.id = queryBuilder(this.getClass())
                 .insert(getColumnNames(columns), getColumnValues(columns));
+
+        return id;
     }
 
     private void update() throws SQLException, IllegalAccessException {

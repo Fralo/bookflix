@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -75,12 +76,13 @@ public class QueryBuilder<T extends Model> {
             parameters.add(value);
         }
 
-        try (PreparedStatement stmt = databaseConnection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             setParameters(stmt);
             stmt.executeUpdate();
 
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
+                System.out.println(rs.getInt(1));
                 return rs.getInt(1);
             }
         }
