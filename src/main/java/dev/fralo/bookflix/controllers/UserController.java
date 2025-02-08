@@ -6,8 +6,7 @@ import dev.fralo.bookflix.easyj.core.Response;
 import dev.fralo.bookflix.easyj.routing.Controller;
 import dev.fralo.bookflix.models.User;
 
-
-public class UserController extends Controller{
+public class UserController extends Controller {
     public UserController() {
         super();
         this.basePath = "/users";
@@ -28,7 +27,18 @@ public class UserController extends Controller{
 
             res.json(u);
         });
+
+        this.get("/{id}/books/{book_id}", (Request req, Response res) -> {
+            String userId = req.getRouteParam("id");
+            String bookId = req.getRouteParam("book_id");
+            String carlo = req.getRouteParam("carlo carcco");
+
+            if (carlo == null) {
+                carlo = "È null";
+            }
+
+            res.send("userId:`".concat(userId).concat("` bookId:`").concat(bookId).concat("` carlo:`").concat(carlo));
+        });
     }
 
-    
 }

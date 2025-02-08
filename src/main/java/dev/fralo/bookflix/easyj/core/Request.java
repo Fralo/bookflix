@@ -31,7 +31,7 @@ public class Request {
         this.headers = exchange.getRequestHeaders();
         this.rawBody = this.readStream(exchange.getRequestBody());
         this.routeParams = new HashMap<>();
-        
+
         // if request is content type json, we parse the body
         String contentType = this.getHeader("Content-Type");
         if (contentType.toLowerCase().contains("application/json")) {
@@ -49,7 +49,7 @@ public class Request {
 
     public void setRouteParam(String name, String value) {
         this.routeParams.put(name, value);
-    } 
+    }
 
     public String getMethod() {
         return this.method;
@@ -102,7 +102,7 @@ public class Request {
         return getBodyField(fieldName, classOfT, Optional.empty());
     }
 
-    //i'm overloading the fields becuse i think it leads to a cleaner API
+    // i'm overloading the fields becuse i think it leads to a cleaner API
 
     public String getBodyString(String fieldName) {
         return getBodyField(fieldName, String.class);
