@@ -2,20 +2,17 @@ package dev.fralo.bookflix.easyj.orm;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import dev.fralo.bookflix.easyj.annotations.orm.Column;
 import dev.fralo.bookflix.easyj.annotations.orm.Id;
-import dev.fralo.bookflix.easyj.annotations.orm.Table;
 
 public abstract class Model {
+
     private static Connection databaseConnection;
 
     @Id
@@ -28,8 +25,8 @@ public abstract class Model {
     }
 
     // Save instance to database (insert or update)
-    public void save() throws SQLException {
-        if (id == null) {
+    public void save() throws SQLException, IllegalAccessException {
+        if (this.id == null) {
             insert();
         } else {
             update();
@@ -41,54 +38,25 @@ public abstract class Model {
             throw new IllegalStateException("Cannot delete a model without an ID.");
         }
 
-        String tableName = getTableName();
-        String sql = "DELETE FROM " + tableName + " WHERE id = ?";
-
-        try (PreparedStatement stmt = databaseConnection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-        }
+        queryBuilder(this.getClass()).where("id", "=", "value").delete();
     }
 
-    private void insert() throws SQLException {
-        String tableName = getTableName();
+    private int insert() throws SQLException, IllegalAccessException {
         List<Field> columns = getPersistableFields();
-        
-        String sql = String.format("INSERT INTO %s (%s) VALUES (%s)",
-                tableName,
-                String.join(", ", getColumnNames(columns)),
-                String.join(", ", Collections.nCopies(columns.size(), "?")));
 
-        
-        System.out.println("Query: " + sql);
-        
-        PreparedStatement preparedStatement = databaseConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            
-        setStatementValues(preparedStatement, columns);
-        preparedStatement.executeUpdate();
-            
-        ResultSet rs = preparedStatement.getGeneratedKeys();
-        if (rs.next()) {
-            this.id = rs.getInt(1);
-        }
+        return queryBuilder(this.getClass())
+                .insert(getColumnNames(columns), getColumnValues(columns));
     }
 
-    private void update() throws SQLException {
-        String tableName = getTableName();
-        List<Field> columns = getPersistableFields();
-        
-        String sql = String.format("UPDATE %s SET %s WHERE id = ?",
-                tableName,
-                String.join(", ", getColumnNames(columns).stream()
-                        .map(c -> c + " = ?")
-                        .toList()));
-
-        try (PreparedStatement stmt = databaseConnection.prepareStatement(sql)) {
-            
-            setStatementValues(stmt, columns);
-            stmt.setInt(columns.size() + 1, this.id);
-            stmt.executeUpdate();
+    private void update() throws SQLException, IllegalAccessException {
+        if (id == null) {
+            throw new IllegalStateException("Cannot update a model without an ID.");
         }
+
+        List<Field> columns = getPersistableFields();
+
+        queryBuilder(this.getClass())
+                .update(this.id, getColumnNames(columns), getColumnValues(columns));
     }
 
     // Helper methods
@@ -104,20 +72,14 @@ public abstract class Model {
                 .toList();
     }
 
-    private void setStatementValues(PreparedStatement stmt, List<Field> fields) throws SQLException {
-        int index = 1;
+    private List<Object> getColumnValues(List<Field> fields) throws IllegalAccessException {
+        List<Object> values = new ArrayList<>();
         for (Field field : fields) {
             field.setAccessible(true);
-            try {
-                stmt.setObject(index++, field.get(this));
-            } catch (IllegalAccessException e) {
-                throw new SQLException("Error accessing field value", e);
-            }
+            values.add(field.get(this));
         }
-    }
 
-    private String getTableName() {
-        return this.getClass().getAnnotation(Table.class).name();
+        return values;
     }
 
     public static <T extends Model> QueryBuilder<T> queryBuilder(Class<T> modelClass) {
@@ -127,9 +89,9 @@ public abstract class Model {
     protected static <T extends Model> T mapResultSetToModel(ResultSet rs, Class<T> modelClass) throws SQLException {
         try {
             T instance = modelClass.getDeclaredConstructor().newInstance();
-            
+
             List<Field> allFields = getAllFields(modelClass);
-            
+
             for (Field field : allFields) {
                 field.setAccessible(true);
                 if (field.isAnnotationPresent(Column.class) || field.isAnnotationPresent(Id.class)) {
@@ -148,47 +110,53 @@ public abstract class Model {
         List<Field> fields = new ArrayList<>();
         while (sourceClass != null) {
             fields.addAll(Arrays.asList(sourceClass.getDeclaredFields()));
-            if(sourceClass == Model.class) {
-                //Here ends our intrested classes
+            if (sourceClass == Model.class) {
+                // Here ends our intrested classes
                 break;
-            } 
-            
+            }
+
             sourceClass = sourceClass.getSuperclass();
         }
-        
+
         return fields;
     }
 
     /**
-     * Parses the value based on the field's type, including special handling for dates.
+     * Parses the value based on the field's type, including special handling
+     * for dates.
      */
     private static Object parseValueBasedOnType(ResultSet rs, Field field, String columnName) throws SQLException {
         Class<?> fieldType = field.getType();
         Object value = rs.getObject(columnName);
-        
+
         if (value == null) {
             return null;
         }
 
-        //Trying to implement Java Dates, to be verified
+        // Trying to implement Java Dates, to be verified
         // if (fieldType == java.util.Date.class) {
-        //     return rs.getTimestamp(columnName);
+        // return rs.getTimestamp(columnName);
         // } else if (fieldType == java.time.LocalDate.class) {
-        //     java.sql.Date date = rs.getDate(columnName);
-        //     return date != null ? date.toLocalDate() : null;
+        // java.sql.Date date = rs.getDate(columnName);
+        // return date != null ? date.toLocalDate() : null;
         // } else if (fieldType == java.time.LocalDateTime.class) {
-        //     java.sql.Timestamp timestamp = rs.getTimestamp(columnName);
-        //     return timestamp != null ? timestamp.toLocalDateTime() : null;
+        // java.sql.Timestamp timestamp = rs.getTimestamp(columnName);
+        // return timestamp != null ? timestamp.toLocalDateTime() : null;
         // }
-
-        //Handles primitives and other types
+        // Handles primitives and other types
         return switch (fieldType.getSimpleName()) {
-            case "int", "Integer" -> rs.getInt(columnName);
-            case "long", "Long" -> rs.getLong(columnName);
-            case "double", "Double" -> rs.getDouble(columnName);
-            case "float", "Float" -> rs.getFloat(columnName);
-            case "boolean", "Boolean" -> rs.getBoolean(columnName);
-            default -> value;
+            case "int", "Integer" ->
+                rs.getInt(columnName);
+            case "long", "Long" ->
+                rs.getLong(columnName);
+            case "double", "Double" ->
+                rs.getDouble(columnName);
+            case "float", "Float" ->
+                rs.getFloat(columnName);
+            case "boolean", "Boolean" ->
+                rs.getBoolean(columnName);
+            default ->
+                value;
         };
     }
 
@@ -196,7 +164,7 @@ public abstract class Model {
     public String toString() {
         String fieldList = "";
 
-        for(Field field : this.getClass().getDeclaredFields()) {
+        for (Field field : this.getClass().getDeclaredFields()) {
             try {
                 field.setAccessible(true);
                 fieldList += field.getName() + "=" + field.get(this) + ",";
@@ -206,9 +174,8 @@ public abstract class Model {
         }
 
         return String.format(
-            "%s(%s)",
-            this.getClass().getName(),
-            fieldList
-        );
+                "%s(%s)",
+                this.getClass().getName(),
+                fieldList);
     }
 }

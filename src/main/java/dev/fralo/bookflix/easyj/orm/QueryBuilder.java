@@ -21,7 +21,11 @@ public class QueryBuilder<T extends Model> {
         this.databaseConnection = connection;
     }
 
-    public QueryBuilder<T> where(String column, String operation, String value) {
+    public QueryBuilder<T> where(String column, Object value) {
+        return this.where(column, "=", value);
+    }
+
+    public QueryBuilder<T> where(String column, String operation, Object value) {
         if (this.whereClause.length() == 0) {
             this.whereClause.append(" WHERE ");
         } else {
