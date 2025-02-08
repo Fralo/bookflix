@@ -1,4 +1,4 @@
-package dev.fralo.bookflix.controllers.requests;
+package dev.fralo.bookflix.requests;
 
 public class RegistrationRequest {
     public String username;
