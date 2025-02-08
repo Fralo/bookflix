@@ -15,7 +15,7 @@ public class UserController extends Controller {
     @Override
     public void register() {
         this.get("/{id}", (Request req, Response res) -> {
-            User u = User.get(User.class, Integer.parseInt(req.getRouteParam("id")));
+            User u = User.get(User.class, req.getRouteParamInt("id"));
             res.json(u);
         });
 
@@ -26,18 +26,6 @@ public class UserController extends Controller {
             u.save();
 
             res.json(u);
-        });
-
-        this.get("/{id}/books/{book_id}", (Request req, Response res) -> {
-            String userId = req.getRouteParam("id");
-            String bookId = req.getRouteParam("book_id");
-            String carlo = req.getRouteParam("carlo carcco");
-
-            if (carlo == null) {
-                carlo = "È null";
-            }
-
-            res.send("userId:`".concat(userId).concat("` bookId:`").concat(bookId).concat("` carlo:`").concat(carlo));
         });
     }
 

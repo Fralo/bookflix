@@ -66,8 +66,63 @@ public class Request {
         return this.exchange.getRequestURI().toString();
     }
 
+    // getter for route parameter with type conversion
+    public <T> T getRouteParam(String name, Class<T> classOfT, Optional<T> defaultValue) {
+        String value = this.routeParams.get(name);
+        if (value == null) {
+            return defaultValue.orElse(null);
+        }
+
+        try {
+            return gson.fromJson("\"" + value + "\"", classOfT);
+        } catch (Exception e) {
+            return defaultValue.orElse(null);
+        }
+    }
+
+    // overload the getRouteParam method to handle default value
+    public <T> T getRouteParam(String name, Class<T> classOfT) {
+        return getRouteParam(name, classOfT, Optional.empty());
+    }
+
     public String getRouteParam(String name) {
-        return this.routeParams.get(name);
+        return getRouteParam(name, String.class);
+    }
+
+    public String getRouteParam(String name, String defaultValue) {
+        return getRouteParam(name, String.class, Optional.of(defaultValue));
+    }
+
+    public Integer getRouteParamInt(String name) {
+        return getRouteParam(name, Integer.class);
+    }
+
+    public int getRouteParamInt(String name, int defaultValue) {
+        return getRouteParam(name, Integer.class, Optional.of(defaultValue));
+    }
+
+    public Double getRouteParamDouble(String name) {
+        return getRouteParam(name, Double.class);
+    }
+
+    public double getRouteParamDouble(String name, double defaultValue) {
+        return getRouteParam(name, Double.class, Optional.of(defaultValue));
+    }
+
+    public Boolean getRouteParamBoolean(String name) {
+        return getRouteParam(name, Boolean.class);
+    }
+
+    public boolean getRouteParamBoolean(String name, boolean defaultValue) {
+        return getRouteParam(name, Boolean.class, Optional.of(defaultValue));
+    }
+
+    public Long getRouteParamLong(String name) {
+        return getRouteParam(name, Long.class);
+    }
+
+    public long getRouteParamLong(String name, long defaultValue) {
+        return getRouteParam(name, Long.class, Optional.of(defaultValue));
     }
 
     public String getRawBody() {
