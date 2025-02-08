@@ -22,7 +22,7 @@ public abstract class Model {
     @Column(name = "id")
     protected Integer id;
 
-    // Set database connection (call this once at startup)
+    // Set database connection (call this once when bootstrapping)
     public static void setDatabase(Connection connection) {
         databaseConnection = connection;
     }

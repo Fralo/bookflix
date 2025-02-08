@@ -1,8 +1,11 @@
 package dev.fralo.bookflix.controllers;
 
+import dev.fralo.bookflix.controllers.requests.RegistrationRequest;
 import dev.fralo.bookflix.easyj.core.Request;
 import dev.fralo.bookflix.easyj.core.Response;
 import dev.fralo.bookflix.easyj.routing.Controller;
+import dev.fralo.bookflix.models.User;
+
 
 public class UserController extends Controller{
     public UserController() {
@@ -13,14 +16,17 @@ public class UserController extends Controller{
     @Override
     public void register() {
         this.get("", (Request req, Response res) -> {
-            res.send(200, "SI PUO FAREEE");
+            User u = User.get(User.class, 1);
+            res.json(u);
         });
 
         this.post("/register", (Request req, Response res) -> {
+            RegistrationRequest registrationReq = req.getBody(RegistrationRequest.class);
 
+            User u = new User(registrationReq.email, registrationReq.password);
+            u.save();
 
-            System.out.println(req.getBody());
-            res.send(201, "SI PUO FAREEE");
+            res.json(u);
         });
     }
 
