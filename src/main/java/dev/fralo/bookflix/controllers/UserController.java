@@ -5,6 +5,7 @@ import dev.fralo.bookflix.easyj.core.Response;
 import dev.fralo.bookflix.easyj.orm.Model;
 import dev.fralo.bookflix.easyj.routing.Controller;
 import dev.fralo.bookflix.easyj.utils.PasswordHasher;
+import dev.fralo.bookflix.models.AuthToken;
 import dev.fralo.bookflix.models.User;
 import dev.fralo.bookflix.requests.LoginRequest;
 import dev.fralo.bookflix.requests.RegistrationRequest;
@@ -17,10 +18,23 @@ public class UserController extends Controller {
 
     @Override
     public void register() {
-        this.get("/{id}", (Request req, Response res) -> {
-            User user = Model.queryBuilder(User.class).where("id", req.getRouteParamInt("id")).get();
+        this.get("/whoami", (Request req, Response res) -> {
 
-            if(user == null) {
+            String bearerToken = req.getHeader("Authorization");
+            if (bearerToken == null) {
+                res.sendUnauthorized();
+                return;
+            }
+
+            String tokenValue = bearerToken.substring("Bearer ".length());
+            AuthToken authToken = Model.queryBuilder(AuthToken.class).where("value", tokenValue).get();
+            if (authToken == null) {
+                res.sendUnauthorized();
+                return;
+            }
+            
+            User user = Model.queryBuilder(User.class).where("id", authToken.getUserId()).get();
+            if (user == null) {
                 res.send(404, "Not found");
             }
 
@@ -33,22 +47,21 @@ public class UserController extends Controller {
             String email = registrationReq.email;
             String password = registrationReq.password;
 
-            if(email == null | password == null) {
+            if (email == null | password == null) {
                 res.send(400, "Invalid mail or password");
                 return;
             }
 
             User user = Model.queryBuilder(User.class).where("email", email).get();
-            if(user != null) {
+            if (user != null) {
                 res.send(400, "The email was already used");
                 return;
             }
 
             PasswordHasher passwordHasher = new PasswordHasher();
             User u = new User(
-                registrationReq.email,
-                passwordHasher.hashPassword(registrationReq.password)
-            );
+                    registrationReq.email,
+                    passwordHasher.hashPassword(registrationReq.password));
             u.save();
 
             res.json(u);
@@ -57,7 +70,7 @@ public class UserController extends Controller {
         this.patch("/{id}", (Request req, Response res) -> {
             User user = Model.queryBuilder(User.class).where("id", req.getRouteParamInt("id")).get();
 
-            if(user == null) {
+            if (user == null) {
                 res.send(404, "Not found");
             }
 
@@ -75,24 +88,28 @@ public class UserController extends Controller {
             String email = loginRequest.email;
             String password = loginRequest.password;
 
-            if(email == null | password == null) {
+            if (email == null | password == null) {
                 res.send(400, "Invalid mail or password");
                 return;
             }
 
             User user = Model.queryBuilder(User.class).where("email", email).get();
-            if(user == null) {
+            if (user == null) {
                 res.send(404, "Not found");
                 return;
             }
 
             PasswordHasher passwordHasher = new PasswordHasher();
 
-            if(!passwordHasher.verifyPassword(password, user.getPassword())) {
+            if (!passwordHasher.verifyPassword(password, user.getPassword())) {
                 res.send(403, "Wrong email or passoword");
             }
 
-            res.json(user);
+            // we create the auth token
+            AuthToken authToken = new AuthToken(user);
+            authToken.save();
+
+            res.json(authToken);
         });
     }
 

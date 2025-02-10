@@ -104,6 +104,7 @@ public abstract class Model {
             }
             return instance;
         } catch (Exception e) {
+            System.err.println(e.getMessage());
             throw new SQLException("Error creating model instance", e);
         }
     }

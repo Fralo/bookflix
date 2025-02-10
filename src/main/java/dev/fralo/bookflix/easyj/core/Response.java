@@ -47,6 +47,10 @@ public class Response {
         status(status).send(content);
     }
 
+    public void sendUnauthorized() throws IOException  {
+        status(403).send("Unauthorized");
+    }
+
     private void sendInternal(byte[] contentBytes, String contentType) throws IOException {
         if (!headersSent) {
             // Set default content type if not already set

@@ -1,0 +1,1 @@
+CREATE TABLE auth_tokens (id bigserial primary key, user_id int NOT NULL, value text not null);
