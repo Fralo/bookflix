@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import dev.fralo.bookflix.easyj.responses.ErrorResponse;
 import dev.fralo.bookflix.easyj.routing.Router;
 
 public class RequestHandler implements HttpHandler {
@@ -18,12 +19,11 @@ public class RequestHandler implements HttpHandler {
 
             router.handle(request, response);
         } catch (Exception e) {
-            System.out.println(e.getClass());
-            String errorMessage = e.getMessage();
-            System.err.println(errorMessage);
+            e.printStackTrace();
 
-            Response errorResponse = new Response(exchange);
-            errorResponse.send(400, errorMessage);
+            Response r = new Response(exchange);
+            ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
+            r.json(errorResponse, errorResponse.getStatus());
         }
     }
 }

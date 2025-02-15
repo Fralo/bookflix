@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -15,6 +16,11 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
+import dev.fralo.bookflix.easyj.auth.AuthToken;
+import dev.fralo.bookflix.easyj.exceptions.RequestUnauthorizedException;
+import dev.fralo.bookflix.easyj.orm.Model;
+import dev.fralo.bookflix.easyj.orm.User;
+
 public class Request {
     private HttpExchange exchange;
     private String method;
@@ -23,6 +29,7 @@ public class Request {
     private Gson gson;
     private JsonObject jsonBody;
     private HashMap<String, String> routeParams;
+    private User user;
 
     public Request(HttpExchange exchange) throws IOException {
         this.gson = new Gson();
@@ -103,7 +110,7 @@ public class Request {
         return getRouteParam(name, String.class, Optional.of(defaultValue));
     }
 
-    public Integer getRouteParamInt(String name) {
+    public int getRouteParamInt(String name) {
         return getRouteParam(name, Integer.class);
     }
 
@@ -210,5 +217,36 @@ public class Request {
             out.append(buffer, 0, numRead);
         }
         return out.toString();
+    }
+
+    public boolean isAuthorized() throws RequestUnauthorizedException, SQLException {
+        if(this.user != null) {
+            return true;
+        }
+
+        String bearerToken = this.getHeader("Authorization");
+        if (bearerToken == null || bearerToken.length() < "Bearer ".length()) {
+            throw new RequestUnauthorizedException("Missing bearer token");
+        }
+
+        String tokenValue = bearerToken.substring("Bearer ".length());
+        AuthToken authToken = Model.queryBuilder(AuthToken.class).where("value", tokenValue).get();
+        if (authToken == null) {
+            throw new RequestUnauthorizedException("Unauthorized");
+        }
+        
+        this.user = Model.queryBuilder(User.class).where("id", authToken.getUserId()).get();
+        if (this.user == null) {
+            throw new RequestUnauthorizedException("Unauthorized");
+        }
+
+        return true;
+    }
+
+    public User getUser() throws RequestUnauthorizedException, SQLException {
+        if(this.user == null) {
+            this.isAuthorized();
+        }
+        return this.user;
     }
 }

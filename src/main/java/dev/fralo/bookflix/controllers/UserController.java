@@ -19,26 +19,7 @@ public class UserController extends Controller {
     @Override
     public void register() {
         this.get("/whoami", (Request req, Response res) -> {
-
-            String bearerToken = req.getHeader("Authorization");
-            if (bearerToken == null) {
-                res.sendUnauthorized();
-                return;
-            }
-
-            String tokenValue = bearerToken.substring("Bearer ".length());
-            AuthToken authToken = Model.queryBuilder(AuthToken.class).where("value", tokenValue).get();
-            if (authToken == null) {
-                res.sendUnauthorized();
-                return;
-            }
-            
-            User user = Model.queryBuilder(User.class).where("id", authToken.getUserId()).get();
-            if (user == null) {
-                res.send(404, "Not found");
-            }
-
-            res.json(user);
+            res.json(req.getUser());
         });
 
         this.post("/register", (Request req, Response res) -> {
@@ -68,16 +49,24 @@ public class UserController extends Controller {
         });
 
         this.patch("/{id}", (Request req, Response res) -> {
-            User user = Model.queryBuilder(User.class).where("id", req.getRouteParamInt("id")).get();
+            User user = req.getUser();
 
-            if (user == null) {
-                res.send(404, "Not found");
+            if(user.getId() != req.getRouteParamInt("id")) {
+                res.send(401, "Unauthorized");
+                return;
             }
 
             res.json(user);
         });
 
         this.delete("/{id}", (Request req, Response res) -> {
+            User user = req.getUser();
+
+            if(user.getId() !=  req.getRouteParamInt("id")) {
+                res.send(401, "Unauthorized");
+                return;
+            }
+
             Model.queryBuilder(User.class).where("id", req.getRouteParamInt("id")).delete();
             res.send(200, "");
         });

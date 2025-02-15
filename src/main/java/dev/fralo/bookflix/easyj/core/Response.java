@@ -38,9 +38,13 @@ public class Response {
     }
 
     public void json(Object data) throws IOException {
+        json(data, 200);
+    }
+
+    public void json(Object data, int status) throws IOException {
         String json = GSON.toJson(data);
         header("Content-Type", "application/json");
-        sendInternal(json.getBytes(StandardCharsets.UTF_8), "application/json");
+        status(status).sendInternal(json.getBytes(StandardCharsets.UTF_8), "application/json");
     }
 
     public void send(int status, String content) throws IOException {
