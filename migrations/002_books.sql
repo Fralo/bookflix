@@ -1,6 +1,8 @@
-CREATE TABLE book (
+CREATE TABLE books (
     id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
     author VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
-    completed BOOLEAN DEFAULT NULL
+    completed BOOLEAN DEFAULT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

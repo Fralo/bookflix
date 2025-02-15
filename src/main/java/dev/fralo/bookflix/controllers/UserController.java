@@ -45,7 +45,7 @@ public class UserController extends Controller {
                     passwordHasher.hashPassword(registrationReq.password));
             u.save();
 
-            res.json(u);
+            res.json(u, 201);
         });
 
         this.patch("/{id}", (Request req, Response res) -> {

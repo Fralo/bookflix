@@ -1,1 +1,6 @@
-CREATE TABLE auth_tokens (id bigserial primary key, user_id int NOT NULL, value text not null);
+CREATE TABLE auth_tokens (
+    id BIGSERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    value TEXT NOT NULL UNIQUE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
