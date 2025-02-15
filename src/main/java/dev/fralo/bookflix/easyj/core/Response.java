@@ -8,10 +8,10 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 
 public class Response {
-    private static final Gson GSON = new Gson();
-    private final HttpExchange exchange;
-    private boolean headersSent = false;
-    private int statusCode = 200;
+    protected static final Gson GSON = new Gson();
+    protected final HttpExchange exchange;
+    protected boolean headersSent = false;
+    protected int statusCode = 200;
 
     public Response(HttpExchange exchange) {
         this.exchange = exchange;

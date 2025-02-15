@@ -1,7 +1,5 @@
 package dev.fralo.bookflix.easyj.routing;
 
-
-
 import dev.fralo.bookflix.easyj.core.Request;
 import dev.fralo.bookflix.easyj.core.Response;
 

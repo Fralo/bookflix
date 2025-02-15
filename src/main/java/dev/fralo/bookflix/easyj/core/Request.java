@@ -43,6 +43,16 @@ public class Request {
         }
     }
 
+    public Request(Request request) throws IOException {
+        this.gson = new Gson();
+        this.exchange = request.exchange;
+        this.method = request.method;
+        this.headers = request.headers;
+        this.rawBody = request.rawBody;
+        this.routeParams = request.routeParams;
+        this.jsonBody = request.jsonBody;
+    }
+
     public void setRouteParams(HashMap<String, String> params) {
         this.routeParams = params;
     }
