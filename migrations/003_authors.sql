@@ -1,1 +1,0 @@
-CREATE TABLE authors(id bigserial primary key, first_name text NOT NULL, last_name text NOT NULL);

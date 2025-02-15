@@ -1,10 +1,10 @@
 package dev.fralo.bookflix.controllers;
 
 import dev.fralo.bookflix.easyj.auth.AuthToken;
+import dev.fralo.bookflix.easyj.auth.User;
 import dev.fralo.bookflix.easyj.core.Request;
 import dev.fralo.bookflix.easyj.core.Response;
 import dev.fralo.bookflix.easyj.orm.Model;
-import dev.fralo.bookflix.easyj.orm.User;
 import dev.fralo.bookflix.easyj.routing.Controller;
 import dev.fralo.bookflix.easyj.utils.PasswordHasher;
 import dev.fralo.bookflix.requests.LoginRequest;

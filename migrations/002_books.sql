@@ -1,1 +1,6 @@
-CREATE TABLE books (id bigserial primary key, title text NOT NULL);
+CREATE TABLE book (
+    id SERIAL PRIMARY KEY,
+    author VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    completed BOOLEAN DEFAULT NULL
+);

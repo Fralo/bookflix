@@ -17,9 +17,9 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
 import dev.fralo.bookflix.easyj.auth.AuthToken;
+import dev.fralo.bookflix.easyj.auth.User;
 import dev.fralo.bookflix.easyj.exceptions.RequestUnauthorizedException;
 import dev.fralo.bookflix.easyj.orm.Model;
-import dev.fralo.bookflix.easyj.orm.User;
 
 public class Request {
     private HttpExchange exchange;

@@ -3,7 +3,6 @@ package dev.fralo.bookflix.easyj.auth;
 import dev.fralo.bookflix.easyj.annotations.orm.Column;
 import dev.fralo.bookflix.easyj.annotations.orm.Table;
 import dev.fralo.bookflix.easyj.orm.Model;
-import dev.fralo.bookflix.easyj.orm.User;
 import dev.fralo.bookflix.easyj.utils.RandomStringGenerator;
 
 @Table(name = "auth_tokens")
